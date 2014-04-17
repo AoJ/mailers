@@ -1,0 +1,30 @@
+{
+  "name": "mailers",
+  "version": "1.0.0",
+  "description": "wrapper for nodeunit mailers",
+  "keywords": [],
+  "author": "AoJ <aoj@n13.cz>",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/AoJ/mailers.git"
+  },
+  "dependencies": {
+    "nodemailer": "^0.6.2",
+    "lodash": "^2.4.1",
+    "errno": "^0.1.1",
+    "request": "^2.34.0",
+    "mandrill-api": "^1.0.39",
+    "async": "^0.7.0",
+    "callqueue": "^1.0.*"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*",
+    "expectations": "*",
+    "simplesmtp": "^0.3.25"
+  },
+  "main": "app",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha --require expectations --reporter list test"
+  }
+}
