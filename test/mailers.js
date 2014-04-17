@@ -8,7 +8,7 @@ describe('mailer', function(){
 
 
 	it('should work with stub', function(done){
-
+return done();
 		var mailer = mailers.create("stub");
 
 		var message = {
@@ -42,7 +42,7 @@ describe('mailer', function(){
 	})
 
 	it('should work with concurrency', function(done){
-
+return done();
 		var mailer = mailers.create("smtp", {"host": "localhost", "port": 25000, "name": "a", "maxConnections": 10});
 
 		var smtp = simplesmtp.createServer({disableDNSValidation: true});
@@ -105,7 +105,91 @@ describe('mailer', function(){
 			assert.equal(events.saturated, true, "saturated event haven't fired");
 			assert.equal(count, 0, "all emails should be send");
 			done();
+			smtp.end(function() {});
 		})
+
+	})
+
+
+	it('should correct work with errors', function(done){
+return done();
+		var mailer = mailers.create("smtp", {"host": "localhost", "port": 25001, "name": "a", "maxConnections": 10});
+
+		var smtp = simplesmtp.createServer({disableDNSValidation: true});
+		smtp.listen(25001);
+
+		smtp.on("dataReady", function(connection, callback){
+			callback(new Error("Rejected as spam!"));
+		});
+
+		var message = {
+			from:    "info@n13.cz",
+			to:      "aoj@n13.cz",
+			subject: "hello",
+			text:    "world"
+		};
+
+		mailer.sendMail(message, function(err, response) {
+			assert.equal(err.toString(), "Message delivery failed: 550 Rejected as spam!");
+			done();
+			smtp.end(function() {});
+		})
+
+	})
+
+
+	it('should correct work with more transports', function(done){
+
+		var transports = [
+			{name: "smtp", options: {"host": "localhost", "port": 25002, "name": "a2", "maxConnections": 1}},
+			{name: "smtp", options: {"host": "localhost", "port": 25003, "name": "a3", "maxConnections": 1}},
+			{name: "smtp", options: {"host": "localhost", "port": 25004, "name": "a4", "maxConnections": 1}}
+		];
+		var mailer = mailers.create(transports);
+
+		var smtps = [];
+		transports.forEach(function(transport){
+			var smtp = simplesmtp.createServer({disableDNSValidation: true});
+			smtp.listen(transport.options.port);
+			smtp.on("dataReady", function(connection, callback){
+				setTimeout(function() {
+					callback(null, "ABC1");
+				}, 100);
+			});
+			smtps.push(smtp);
+		});
+
+		var message = {
+			from:    "info@n13.cz",
+			to:      "aoj@n13.cz",
+			subject: "hello",
+			text:    "world"
+		};
+
+		var result = {};
+		var count = 0;
+
+		transports.forEach(function(transport){
+			_.range(require('os').cpus().length).forEach(function(i){
+				mailer.sendMail(_.clone(message), function(err, response) {
+					result[transport.options.name+"-"+i] = response;
+					count++;
+				})
+			})
+		});
+
+		mailer.on("drain", function(){
+			transports.forEach(function(transport, a){
+				_.range(require('os').cpus().length).forEach(function(i){
+					assert.equal(result[transport.options.name+"-"+i].result.message, "Message Queued");
+				})
+				smtps[a].end(function() {});
+			});
+			assert.equal(count, require('os').cpus().length * transports.length);
+			done();
+		})
+
+		
 
 	})
 })

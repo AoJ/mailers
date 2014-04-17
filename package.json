@@ -1,6 +1,6 @@
 {
   "name": "mailers",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "wrapper for nodeunit mailers",
   "keywords": [],
   "author": "AoJ <aoj@n13.cz>",
