@@ -1,6 +1,6 @@
-
 # Mailers [![Build Status](https://travis-ci.org/AoJ/mailers.svg?branch=master)](https://travis-ci.org/AoJ/mailers)
 
+mailing library.
 
 ## Example
 ```js
