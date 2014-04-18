@@ -8,7 +8,7 @@ describe('mailer', function(){
 
 
 	it('should work with stub', function(done){
-return done();
+
 		var mailer = mailers.create("stub");
 
 		var message = {
@@ -42,7 +42,7 @@ return done();
 	})
 
 	it('should work with concurrency', function(done){
-return done();
+
 		var mailer = mailers.create("smtp", {"host": "localhost", "port": 25000, "name": "a", "maxConnections": 10});
 
 		var smtp = simplesmtp.createServer({disableDNSValidation: true});
@@ -112,7 +112,7 @@ return done();
 
 
 	it('should correct work with errors', function(done){
-return done();
+
 		var mailer = mailers.create("smtp", {"host": "localhost", "port": 25001, "name": "a", "maxConnections": 10});
 
 		var smtp = simplesmtp.createServer({disableDNSValidation: true});
